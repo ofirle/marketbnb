@@ -229,7 +229,7 @@ import GoogleMapCustom from "./GoogleMap/GoogleMapCustom";
 // );
 
 const App = () => {
-    const { isLoaded} = useLoadScript({googleMapsApiKey: "AIzaSyAt-fPyvxpKWhAZJCQ_fo86d_REWkyfOZ4" })
+    const { isLoaded} = useLoadScript({googleMapsApiKey: "" })
     // if(!isLoaded) return <div>Loading...</div>;
     const [disabled, setDisabled] = useState(false);
     const [prices, setPrices] = useState({min: 0, max: 1300});
