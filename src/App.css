@@ -5,3 +5,8 @@
 .cell-component-text {
   margin-left: 8px;
 }
+
+.map-container {
+  height: 100vh;
+  width: 100%;
+}
