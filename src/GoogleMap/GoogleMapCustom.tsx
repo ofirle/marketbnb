@@ -1,7 +1,7 @@
-import useAxios from "../FetchData/useAxios";
 import React, {useEffect, useState} from "react";
 import {GoogleMap, Marker, Polygon} from "@react-google-maps/api";
-import axios, {AxiosRequestConfig} from "axios";
+import axios from "axios";
+import {FullInfoSquare, SquareCoordinates, SquareData} from "./interfaces";
 
 interface GoogleMapCustomProps {
     filters: {
@@ -14,60 +14,15 @@ interface GoogleMapCustomProps {
 }
 const  GoogleMapCustom = ({filters}: GoogleMapCustomProps) => {
     const [squares, setSquares] = useState<FullInfoSquare[]>([]);
+    const [centerMap, setCenterMap] = useState<{ lat: number, lng: number }>({ lat: 37.9742130138931, lng: 23.726449789715446 });
     const [availabilityData, setAvailabilityData] = useState<SquareData[]>([]);
     const [squaresCoordinates, setSquaresCoordinates] = useState<SquareCoordinates[]>([]);
-    interface SquareData {
-        square_id: number;
-        properties_count: number;
-        occupancy: number;
-        cost_per_night: number | null;
-        url: string;
-    }
-
-    interface SquareCoordinates {
-        center: {lat: number, lng: number};
-        coordinates: {lat: number, lng: number}[];
-        id: number
-    }
-
-    interface FullInfoSquare {
-        square_id?: number;
-        properties_count?: number;
-        occupancy?: number;
-        cost_per_night?: number | null;
-        url?: string;
-        center: {lat: number, lng: number};
-        coordinates: {lat: number, lng: number}[];
-        id: number
-    }
-
-    interface ResponseData {
-        data: SquareData[];
-    }
-    // const { data, error, loaded } = useAxios<any>({
-    //     url: "http://localhost:3000/coordinates/squaresCoordinates",
-    //     method: "GET",
-    // });
-    // const { data: availabilityData, error: availabilityError } = useAxios<ResponseData>({
-    //     url: "http://localhost:3000/coordinates/info",
-    //     method: "GET",
-    //     params: { ...{checkIn: '2023-05-25', checkOut: '2023-05-28', propertiesCount: filters.propertiesCount, minPrice: filters.prices.min, maxPrice: filters.prices.max} }, // Include the uniqueKey in the payload
-    // });
-    const axiosParams: AxiosRequestConfig = {
-        method: 'GET',
-        url: '/coordinates/info',
-        params: {
-            checkIn: '2023-05-25', checkOut: '2023-05-28', propertiesCount: filters.propertiesCount, minPrice: filters.prices.min, maxPrice: filters.prices.max}
-    };
-    // const { response, error: availabilityError, loading, sendData } = useAxios<any>(axiosParams);
-
-
-
 
     useEffect(() => {
         async function fetchData() {
             const request = await axios.get('http://localhost:3000/coordinates/squaresCoordinates', { method: "get" });
             setSquaresCoordinates(request.data.data)
+            setCenterMap(request.data.center);
 
             console.log(request);
         }
@@ -77,7 +32,7 @@ const  GoogleMapCustom = ({filters}: GoogleMapCustomProps) => {
     useEffect(() => {
         async function fetchData() {
             const request = await axios.get('http://localhost:3000/coordinates/info', { method: "get", params: {
-                    checkIn: '2023-05-25', checkOut: '2023-05-28', propertiesCount: filters.propertiesCount, minPrice: filters.prices.min, maxPrice: filters.prices.max}
+                    checkIn: '2023-06-15', checkOut: '2023-06-18', propertiesCount: filters.propertiesCount, minPrice: filters.prices.min, maxPrice: filters.prices.max}
             });
             console.log(request.data.data, "datare")
             setAvailabilityData(request.data.data)
@@ -87,36 +42,14 @@ const  GoogleMapCustom = ({filters}: GoogleMapCustomProps) => {
 
 
     useEffect(() => {
-        // console.log(availabilityData, "availabilityData");
         if(!squaresCoordinates || !availabilityData) return;
-        // console.log([squaresCoordinates, availabilityData], "data");
         const mergedArray: any[] = squaresCoordinates.map((firstObj: SquareCoordinates) => {
             const secondObj: any = availabilityData.find((secondObj:SquareData) => secondObj.square_id === firstObj.id);
             return { ...firstObj, ...secondObj };
         });
-        // console.log(mergedArray, "MA");
         setSquares(mergedArray);
     }, [squaresCoordinates, availabilityData])
 
-    const center = { lat: 37.956229176304426,
-        lng: 23.70912982772603 }
-
-    const options = {
-        fillColor: "lightblue",
-        fillOpacity: 0.4,
-        strokeColor: "blue",
-        strokeOpacity: 1,
-        strokeWeight: 1,
-        clickable: false,
-        draggable: false,
-        editable: false,
-        geodesic: false,
-        zIndex: 1
-    }
-
-    const onLoad = (polygon: any) => {
-        console.log("polygon: ", polygon);
-    }
     const mapContainerStyle = {
         width: '100%',
         height: '100vh',
@@ -135,29 +68,6 @@ const  GoogleMapCustom = ({filters}: GoogleMapCustomProps) => {
             geodesic: false,
             zIndex: 1
         }
-        const gradientColor = new Map<number, string>([
-            [0, '#57bb8a'],
-            [5, '#63b682'],
-            [10, '#73b87e'],
-            [15 , '#84bb7b'],
-            [20 , '#94bd77'],
-            [25 , '#a4c073'],
-            [30 , '#b0be6e'],
-            [35 , '#c4c56d'],
-            [40 , '#d4c86a'],
-            [45 , '#e2c965'],
-            [50 , '#f5ce62'],
-            [55 , '#f3c563'],
-            [60 , '#e9b861'],
-            [65 , '#e6ad61'],
-            [70 , '#ecac67'],
-            [75 , '#e9a268'],
-            [80 , '#e79a69'],
-            [85 , '#e5926b'],
-            [90 , '#e2886c'],
-            [95 , '#e0816d'],
-            [100, '#dd776e']
-        ]);
         const colorBordeaux = '#5F021F';
         const colorDarkRed = '#8B0000';
         const colorLightRed = '#FFCCCB';
@@ -167,8 +77,8 @@ const  GoogleMapCustom = ({filters}: GoogleMapCustomProps) => {
         const colorGray = '#808080';
 
         if(!occupancyRate) {
-            options.fillColor = 'gray';
-        }else {
+            options.fillColor = 'black';
+        } else {
             let color = 'gray';
             if(occupancyRate >= 95) color = colorBordeaux;
             else if(occupancyRate >= 90) color = colorDarkRed;
@@ -186,8 +96,8 @@ const  GoogleMapCustom = ({filters}: GoogleMapCustomProps) => {
         <GoogleMap
             id="marker-example"
             mapContainerStyle={mapContainerStyle}
-            zoom={18}
-            center={center}
+            zoom={14}
+            center={centerMap}
         >
             {squares.map((square: FullInfoSquare) => (<><Polygon
                 paths={square.coordinates}
@@ -196,11 +106,6 @@ const  GoogleMapCustom = ({filters}: GoogleMapCustomProps) => {
             />
                 {/*<Marker position={square.center} label={(square.id).toString()}/>*/}
             </>))}
-            {/*<Polygon*/}
-            {/*    onLoad={onLoad}*/}
-            {/*    paths={paths}*/}
-            {/*    options={options}*/}
-            {/*/>*/}
         </GoogleMap>
     );
 }
