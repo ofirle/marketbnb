@@ -3,7 +3,7 @@ import logo from './logo.svg';
 // import './index.css';
 import './App.css';
 import {ColumnsType} from "antd/es/table";
-import {Col, Divider, Row, Slider, Space, Switch, Table, Typography} from "antd";
+import {Button, Col, Divider, Row, Slider, Space, Switch, Table, Typography} from "antd";
 import Icon from "@ant-design/icons";
 import GroupChart from "./GroupChart/GroupChart";
 import MainTable from "./MainTable/MainTable";
@@ -229,11 +229,13 @@ import GoogleMapCustom from "./GoogleMap/GoogleMapCustom";
 // );
 
 const App = () => {
-    const { isLoaded} = useLoadScript({googleMapsApiKey: "" })
+    console.log("APP Loaded");
+    const { isLoaded} = useLoadScript({googleMapsApiKey: "AIzaSyAt-fPyvxpKWhAZJCQ_fo86d_REWkyfOZ4" })
     // if(!isLoaded) return <div>Loading...</div>;
     const [disabled, setDisabled] = useState(false);
     const [prices, setPrices] = useState({min: 0, max: 1300});
     const [propertiesCount, setPropertiesCount] = useState(0);
+    const [showButton, setShowButton] = useState(true);
 
     const onChange = (checked: boolean) => {
         setDisabled(checked);
@@ -242,9 +244,10 @@ const App = () => {
     return (<>
             <Row>
                 <Col span={24}>
-                    Properties Count: <Slider defaultValue={0} disabled={disabled} min={0} max={230} style={{width: '50%'}} onAfterChange={(value) => setPropertiesCount(value)}/>
+                    Properties Count: <Slider defaultValue={0} disabled={disabled} min={0} max={80} style={{width: '50%'}} onAfterChange={(value) => setPropertiesCount(value)}/>
                     Prices: <Slider range defaultValue={[0, 1300]} disabled={disabled} min={0} max={1300} style={{width: '50%'}} onAfterChange={(values) => setPrices({min: values[0], max: values[1]})}/>
                     Disabled: <Switch size="small" checked={disabled} onChange={onChange} />
+                    Disabled: <Button onClick={()=>setShowButton(!showButton)}>Click Me! </Button>
                 </Col>
             </Row>
             <Row>

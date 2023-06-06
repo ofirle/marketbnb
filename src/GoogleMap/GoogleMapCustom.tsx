@@ -1,7 +1,10 @@
 import React, {useEffect, useState} from "react";
-import {GoogleMap, Marker, Polygon} from "@react-google-maps/api";
+import {GoogleMap, InfoBox, InfoBoxProps, InfoWindow, Marker, Polygon} from "@react-google-maps/api";
 import axios from "axios";
 import {FullInfoSquare, SquareCoordinates, SquareData} from "./interfaces";
+import PolygonComponent from "./PolygonComponent";
+import {InfoBoxOptions} from "@react-google-maps/infobox";
+import InfoBoxContent from "./InfoBoxComponent/InfoBoxContent/InfoBoxContent";
 
 interface GoogleMapCustomProps {
     filters: {
@@ -10,45 +13,75 @@ interface GoogleMapCustomProps {
             min: number;
             max: number;
         };
-    };
+    },
 }
-const  GoogleMapCustom = ({filters}: GoogleMapCustomProps) => {
+
+const divStyle = {
+    background: `white`,
+    width: 250,
+    // border: `1px solid #ccc`,
+    padding: 10
+}
+
+const onLoad = (infoBox: any) => {
+    console.log('infoBox: ', infoBox)
+};
+
+
+const GoogleMapCustom = ({filters}: GoogleMapCustomProps) => {
+    const DEFAULT_CENTER_MAP: { lat: number, lng: number } = {
+        lat: 37.9742130138931,
+        lng: 23.726449789715446
+    };
     const [squares, setSquares] = useState<FullInfoSquare[]>([]);
-    const [centerMap, setCenterMap] = useState<{ lat: number, lng: number }>({ lat: 37.9742130138931, lng: 23.726449789715446 });
+    const [centerMap, setCenterMap] = useState<{ lat: number, lng: number }>(DEFAULT_CENTER_MAP);
     const [availabilityData, setAvailabilityData] = useState<SquareData[]>([]);
     const [squaresCoordinates, setSquaresCoordinates] = useState<SquareCoordinates[]>([]);
+    const [showInfo, setShowInfo] = useState<boolean>(false);
+    const [hoverSquare, setHoverSquare] = useState<FullInfoSquare | null>(null);
+
 
     useEffect(() => {
+        console.log("GoogleMapCustom Loaded")
+
         async function fetchData() {
-            const request = await axios.get('http://localhost:3000/coordinates/squaresCoordinates', { method: "get" });
+            const request = await axios.get('http://localhost:3000/coordinates/squaresCoordinates', {method: "get"});
             setSquaresCoordinates(request.data.data)
             setCenterMap(request.data.center);
 
             console.log(request);
         }
+
         fetchData();
     }, [])
 
     useEffect(() => {
         async function fetchData() {
             const request = await axios.get('http://localhost:3000/coordinates/info', { method: "get", params: {
-                    checkIn: '2023-06-15', checkOut: '2023-06-18', propertiesCount: filters.propertiesCount, minPrice: filters.prices.min, maxPrice: filters.prices.max}
+                    checkIn: '2023-06-22', checkOut: '2023-06-25', propertiesCount: filters.propertiesCount, minPrice: filters.prices.min, maxPrice: filters.prices.max}
             });
             console.log(request.data.data, "datare")
             setAvailabilityData(request.data.data)
         }
+
         fetchData();
     }, [filters])
 
 
     useEffect(() => {
-        if(!squaresCoordinates || !availabilityData) return;
+        if (!squaresCoordinates || !availabilityData) return;
         const mergedArray: any[] = squaresCoordinates.map((firstObj: SquareCoordinates) => {
-            const secondObj: any = availabilityData.find((secondObj:SquareData) => secondObj.square_id === firstObj.id);
-            return { ...firstObj, ...secondObj };
+            const secondObj: any = availabilityData.find((secondObj: SquareData) => secondObj.square_id === firstObj.id);
+            return {...firstObj, ...secondObj};
         });
         setSquares(mergedArray);
     }, [squaresCoordinates, availabilityData])
+
+    const options: InfoBoxOptions = {
+        position: new google.maps.LatLng(hoverSquare?.center || DEFAULT_CENTER_MAP),
+        visible: showInfo,
+        alignBottom: true,
+    }
 
     const mapContainerStyle = {
         width: '100%',
@@ -98,14 +131,21 @@ const  GoogleMapCustom = ({filters}: GoogleMapCustomProps) => {
             mapContainerStyle={mapContainerStyle}
             zoom={14}
             center={centerMap}
+            key={'marker-example'}
         >
-            {squares.map((square: FullInfoSquare) => (<><Polygon
-                paths={square.coordinates}
-                options={getOptions(square?.occupancy || null)}
-                onClick={() => window.open(square.url, '_blank')}
-            />
-                {/*<Marker position={square.center} label={(square.id).toString()}/>*/}
-            </>))}
+            <InfoBox
+                onLoad={onLoad}
+                options={options}
+            >
+                <div style={divStyle}>
+                    <h3>Square Id: {hoverSquare?.id}</h3>
+                    <InfoBoxContent square={hoverSquare}/>
+                </div>
+            </InfoBox>
+            {squares.map((square: FullInfoSquare) => (
+                <PolygonComponent square={square} onChangeShowInfo={(value: boolean) => setShowInfo(value)}
+                                  setHoverSquare={((squareHover: FullInfoSquare) => setHoverSquare(squareHover))}/>))}
+            {/*<Marker position={square.center} label={(square.id).toString()}/>*/}
         </GoogleMap>
     );
 }
