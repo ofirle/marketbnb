@@ -41,7 +41,12 @@ const getOptions = (occupancyRate: number | null) => {
 }
 
 
-const PolygonComponent = ({square, onChangeShowInfo, setHoverSquare}: { square: FullInfoSquare, onChangeShowInfo: (value: boolean) => void; setHoverSquare: (square: FullInfoSquare) => void }) => {
+const PolygonComponent = ({square, onChangeShowInfo, setHoverSquare, squareClicked}: {
+    square: FullInfoSquare,
+    onChangeShowInfo: (value: boolean) => void;
+    setHoverSquare: (square: FullInfoSquare) => void,
+    squareClicked: (square: FullInfoSquare) => void,
+}) => {
     const [open, setOpen] = useState(false);
 
     const hide = () => {
@@ -56,7 +61,7 @@ const PolygonComponent = ({square, onChangeShowInfo, setHoverSquare}: { square: 
         key={square.id}
         paths={square.coordinates}
         options={getOptions(square?.occupancy || null)}
-        onClick={() => window.open(square.url, '_blank')}
+        onClick={() => squareClicked(square)}
         onMouseOver={() => {
             onChangeShowInfo(true);
             setHoverSquare(square);

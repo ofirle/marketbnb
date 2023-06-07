@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {GoogleMap, InfoBox, InfoBoxProps, InfoWindow, Marker, Polygon} from "@react-google-maps/api";
+import {Autocomplete, GoogleMap, InfoBox, LoadScript, InfoWindow, Marker, Polygon} from "@react-google-maps/api";
 import axios from "axios";
 import {FullInfoSquare, SquareCoordinates, SquareData} from "./interfaces";
 import PolygonComponent from "./PolygonComponent";
@@ -14,6 +14,7 @@ interface GoogleMapCustomProps {
             max: number;
         };
     },
+    squareClicked: (square: any) => void;
 }
 
 const divStyle = {
@@ -28,7 +29,7 @@ const onLoad = (infoBox: any) => {
 };
 
 
-const GoogleMapCustom = ({filters}: GoogleMapCustomProps) => {
+const GoogleMapCustom = ({filters, squareClicked}: GoogleMapCustomProps) => {
     const DEFAULT_CENTER_MAP: { lat: number, lng: number } = {
         lat: 37.9742130138931,
         lng: 23.726449789715446
@@ -125,6 +126,20 @@ const GoogleMapCustom = ({filters}: GoogleMapCustomProps) => {
         return options;
     }
 
+    const onLoad = (autocomplete: any) => {
+        console.log('autocomplete: ', autocomplete)
+
+        // this.autocomplete = autocomplete
+    }
+
+    const onPlaceChanged = () => {
+        // if (this.autocomplete !== null) {
+        //     console.log(this.autocomplete.getPlace())
+        // } else {
+        //     console.log('Autocomplete is not loaded yet!')
+        // }
+    }
+
     return (
         <GoogleMap
             id="marker-example"
@@ -133,6 +148,30 @@ const GoogleMapCustom = ({filters}: GoogleMapCustomProps) => {
             center={centerMap}
             key={'marker-example'}
         >
+            <Autocomplete
+                onLoad={onLoad}
+                onPlaceChanged={onPlaceChanged}
+            >
+                <input
+                    type="text"
+                    placeholder="Customized your placeholder"
+                    style={{
+                        boxSizing: `border-box`,
+                        border: `1px solid transparent`,
+                        width: `240px`,
+                        height: `32px`,
+                        padding: `0 12px`,
+                        borderRadius: `3px`,
+                        boxShadow: `0 2px 6px rgba(0, 0, 0, 0.3)`,
+                        fontSize: `14px`,
+                        outline: `none`,
+                        textOverflow: `ellipses`,
+                        position: "absolute",
+                        left: "50%",
+                        marginLeft: "-120px"
+                    }}
+                />
+            </Autocomplete>
             <InfoBox
                 onLoad={onLoad}
                 options={options}
@@ -144,7 +183,7 @@ const GoogleMapCustom = ({filters}: GoogleMapCustomProps) => {
             </InfoBox>
             {squares.map((square: FullInfoSquare) => (
                 <PolygonComponent square={square} onChangeShowInfo={(value: boolean) => setShowInfo(value)}
-                                  setHoverSquare={((squareHover: FullInfoSquare) => setHoverSquare(squareHover))}/>))}
+                                  setHoverSquare={((squareHover: FullInfoSquare) => setHoverSquare(squareHover))} squareClicked={(square) => squareClicked(square)}/>))}
             {/*<Marker position={square.center} label={(square.id).toString()}/>*/}
         </GoogleMap>
     );
