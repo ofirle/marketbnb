@@ -1,0 +1,10 @@
+.properties-table {
+    font-size: 12px;
+}
+
+.properties-table .ant-table-thead th {
+    font-size: 12px;
+}
+.properties-table .ant-table-tbody td {
+    font-size: 12px;
+}

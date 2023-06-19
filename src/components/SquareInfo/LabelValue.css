@@ -1,0 +1,11 @@
+.label {
+    font-size: 14px;
+    font-family: 'Roboto', 'sans-serif';
+    font-weight: 900;
+}
+
+.value {
+    font-size: 14px;
+    font-family: 'Roboto', 'sans-serif';
+    font-weight: 500;
+}

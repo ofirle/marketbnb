@@ -58,6 +58,7 @@ const GoogleMapCustom = ({filters, squareClicked}: GoogleMapCustomProps) => {
 
     useEffect(() => {
         async function fetchData() {
+            // if(filters.propertiesCount)
             const request = await axios.get('http://localhost:3000/coordinates/info', { method: "get", params: {
                     checkIn: '2023-06-22', checkOut: '2023-06-25', propertiesCount: filters.propertiesCount, minPrice: filters.prices.min, maxPrice: filters.prices.max}
             });

@@ -1,0 +1,25 @@
+.square-headline {
+    font-size: 22px;
+    font-family: 'Roboto', 'sans-serif';
+    font-weight: 900;
+}
+
+.last-scraped-data {
+    color: #8c8c8c;
+    font-family: 'Roboto', 'sans-serif';
+}
+
+.occupancies-text {
+    color: #8c8c8c;
+    font-family: 'Roboto', 'sans-serif';
+    font-weight: 700;
+    font-size: 16px;
+}
+
+svg {
+    height: 22px;
+}
+
+.airbnb-link {
+    cursor: pointer;
+}
