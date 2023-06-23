@@ -17,7 +17,7 @@ const ModalComponent = ({open, onClose}: { open: boolean; onClose: () => void })
 
     useEffect(() => {
         async function fetchData() {
-            const request = await axios.get(`http://localhost:3000/properties/init?breakdown=${step}&max_price_properties=${maxPropertiesPrice}&max_price_squares=${maxSquaresPrice}`, {method: "get"});
+            const request = await axios.get(`${process.env.REACT_APP_API_URL}/properties/init?breakdown=${step}&max_price_properties=${maxPropertiesPrice}&max_price_squares=${maxSquaresPrice}`, {method: "get"});
             setAvailableProperties(request.data.properties as number[])
             setAvailableSquares(request.data.squares as number[])
         }

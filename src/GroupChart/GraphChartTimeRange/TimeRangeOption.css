@@ -1,0 +1,7 @@
+.isSelected {
+    border-bottom: #2C7EF2 1px solid;
+}
+
+.option {
+    cursor: pointer;
+}

@@ -46,7 +46,7 @@ const GoogleMapCustom = ({filters, squareClicked}: GoogleMapCustomProps) => {
         console.log("GoogleMapCustom Loaded")
 
         async function fetchData() {
-            const request = await axios.get('http://localhost:3000/coordinates/squaresCoordinates', {method: "get"});
+            const request = await axios.get(`${process.env.REACT_APP_API_URL}/coordinates/squaresCoordinates`, {method: "get"});
             setSquaresCoordinates(request.data.data)
             setCenterMap(request.data.center);
 
@@ -59,7 +59,7 @@ const GoogleMapCustom = ({filters, squareClicked}: GoogleMapCustomProps) => {
     useEffect(() => {
         async function fetchData() {
             // if(filters.propertiesCount)
-            const request = await axios.get('http://localhost:3000/coordinates/info', { method: "get", params: {
+            const request = await axios.get(`${process.env.REACT_APP_API_URL}/coordinates/info`, { method: "get", params: {
                     checkIn: '2023-06-22', checkOut: '2023-06-25', propertiesCount: filters.propertiesCount, minPrice: filters.prices.min, maxPrice: filters.prices.max}
             });
             console.log(request.data.data, "datare")

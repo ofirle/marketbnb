@@ -185,7 +185,7 @@ const SquarePage = ({ id }: {id: number | null}) => {
     useEffect(() => {
         if(id === null) return;
         async function fetchData() {
-            const request = await axios.get(`http://localhost:3000/coordinates/info/${id}`, {method: "get"});
+            const request = await axios.get(`${process.env.REACT_APP_API_URL}/coordinates/info/${id}`, {method: "get"});
             setSquareData(request.data)
         }
 
