@@ -1,7 +1,8 @@
 import {Button, Col, Collapse, Divider, Row, Space, Table, Typography} from "antd";
 import React, {useState} from "react";
-import {Occupancy, SquareData} from "../../interfaces/squarePage";
-import {ReactComponent as AirbnbIcon} from '../../assets/icons/airbnb-icon.svg';
+import {SquareData} from "../../interfaces/squarePage";
+// import AirbnbIcon from '../../assets/icons/airbnb-icon.svg';
+import Icon from '@ant-design/icons';
 import LabelValue from "./LabelValue";
 import './SquareInfo.css'
 import {getFormattedDate, getOccupancyTableData, getRoundNumber, getSmallestDaysDiffData} from "../../utils";
@@ -161,11 +162,11 @@ const SquareInfo = ({squareData, totalSquares}: { squareData: null | SquareData,
     const getData = (timeFrameKey: TimeFrameEnum, data: any[]) => {
         switch (timeFrameKey) {
             case TimeFrameEnum.Weeks4:
-                return data.slice(0,4);
+                return data.slice(0, 4);
             case TimeFrameEnum.Months3:
-                return data.slice(0,6);
+                return data.slice(0, 6);
             case TimeFrameEnum.Year:
-                return data.slice(0,10);
+                return data.slice(0, 10);
             case TimeFrameEnum.AllTime:
                 return data;
         }
@@ -174,14 +175,17 @@ const SquareInfo = ({squareData, totalSquares}: { squareData: null | SquareData,
         {
             key: '1',
             label: 'Properties',
-            children: <GraphChartTimeRange onTimeFrameChanged={setPropertyTimeFrame} isGroup={false} selected={propertyTimeFrame}  data={getData(propertyTimeFrame, propertiesData)}/>,
+            children: <GraphChartTimeRange onTimeFrameChanged={setPropertyTimeFrame} isGroup={false}
+                                           selected={propertyTimeFrame}
+                                           data={getData(propertyTimeFrame, propertiesData)}/>,
         },
     ];
     const items2: CollapseProps['items'] = [
         {
             key: 'occupancy',
             label: 'Occupancy',
-            children: <GraphChartTimeRange onTimeFrameChanged={setOccupancyTimeFrame} selected={occupancyTimeFrame} data={getData(occupancyTimeFrame, OccupancyData)} isGroup={true}/>,
+            children: <GraphChartTimeRange onTimeFrameChanged={setOccupancyTimeFrame} selected={occupancyTimeFrame}
+                                           data={getData(occupancyTimeFrame, OccupancyData)} isGroup={true}/>,
         },
     ];
 
@@ -190,7 +194,7 @@ const SquareInfo = ({squareData, totalSquares}: { squareData: null | SquareData,
             <Col span={15}>
                 <Space>
                     <Typography.Text className={'square-headline'}>Square {squareData.id}</Typography.Text>
-                    <AirbnbIcon onClick={() => window.open(squareData.url, '_blank')} className={'airbnb-link'}/>
+                    {/*<Icon component={AirbnbIcon} onClick={() => window.open(squareData.url, '_blank')} className={'airbnb-link'}/>*/}
                 </Space>
             </Col>
 
