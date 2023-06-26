@@ -1,16 +1,16 @@
+import type {CollapseProps} from 'antd';
 import {Button, Col, Collapse, Divider, Row, Space, Table, Typography} from "antd";
 import React, {useState} from "react";
 import {SquareData} from "../../interfaces/squarePage";
 // import AirbnbIcon from '../../assets/icons/airbnb-icon.svg';
-import Icon from '@ant-design/icons';
-import LabelValue from "./LabelValue";
+import SquareInfoDetailRow from "./SquareInfoDetailRow";
 import './SquareInfo.css'
-import {getFormattedDate, getOccupancyTableData, getRoundNumber, getSmallestDaysDiffData} from "../../utils";
+import {getOccupancyTableData, getRoundNumber, getSmallestDaysDiffData} from "../../utils";
 import {ColumnsType} from "antd/es/table";
 import axios from "axios";
-import type {CollapseProps} from 'antd';
 import GraphChartTimeRange from "../../GroupChart/GraphChartTimeRange/GraphChartTimeRange";
-import {TimeFrameEnum} from "../../GroupChart/GraphChartTimeRange/timeRange.type";
+import {TimeFrameEnum} from "../TimeFrameTabs/timeRange.type";
+import TimeFrameTabs from "../TimeFrameTabs/TimeFrameTabs";
 
 
 const columns: ColumnsType<any> = [
@@ -191,49 +191,103 @@ const SquareInfo = ({squareData, totalSquares}: { squareData: null | SquareData,
 
     return (<>
         <Row>
-            <Col span={15}>
-                <Space>
-                    <Typography.Text className={'square-headline'}>Square {squareData.id}</Typography.Text>
-                    {/*<Icon component={AirbnbIcon} onClick={() => window.open(squareData.url, '_blank')} className={'airbnb-link'}/>*/}
-                </Space>
-            </Col>
-
-            <Col span={9}>
-                <Typography.Text className={'last-scraped-data'}>Last
-                    Scraped: {getFormattedDate(squareData.last_scraped_date)}</Typography.Text>
-            </Col>
-        </Row>
-        <Row>
-            <Col span={18}>
+            <Col span={24}>
                 <Row style={{marginTop: 16}}>
-                    <LabelValue label={'Properties count'}
-                                value={`${squareData.properties.data.length} (${squareData.properties.place} out of ${totalSquares})`}/>
+                    <SquareInfoDetailRow label={'Stock'}
+                                         value={(squareData.properties.data.length).toString()}
+                                         statistics={{
+                                             percentile: 0,
+                                             place: squareData.properties.place,
+                                             totalCount: totalSquares
+                                         }}
+                                         tooltipMessage={'Total Change in stock over selected time period'}
+                                         fluctuate={'INCREASE'}
+                                         timeFrameChange={{
+                                             value: 12,
+                                         }}
+                    />
                 </Row>
                 <Row style={{marginTop: 8}}>
-                    <LabelValue label={'Avg. Cost Per Night'}
-                                value={`${getRoundNumber(squareData.pricePerNightWeekend.average)}${squareData.currency} (${squareData.pricePerNightWeekend.place} out of ${totalSquares})`}/>
+                    <SquareInfoDetailRow label={'Stock Moment'}
+                                         value={``}
+                                         statistics={{
+                                             percentile: 0,
+                                             place: 0,
+                                             totalCount: totalSquares
+                                         }}
+                                         tooltipMessage={'% Change in stock over selected time period'}
+                                         fluctuate={'INCREASE'}
+                                         timeFrameChange={{
+                                             value: 38,
+                                             suffix: '%'
+                                         }}
+
+                    />
+                </Row>
+                <Divider/>
+                <Row style={{marginTop: 8}}>
+                    <SquareInfoDetailRow label={'Occupancy'}
+                                         value={`${getRoundNumber(districtOccupancies.average)}%`}
+                                         statistics={{
+                                             percentile: 0,
+                                             place: 0,
+                                             totalCount: totalSquares
+                                         }}
+                                         tooltipMessage={'% Occupied 2W_AWD'}
+                                         fluctuate={'INCREASE'}
+                                         timeFrameChange={{
+                                             value: 3,
+                                             suffix: '%'
+                                         }}
+
+                    />
                 </Row>
                 <Row style={{marginTop: 8}}>
-                    <LabelValue label={'Avg. Rating'}
-                                value={`${squareData.ratings.average ? getRoundNumber(squareData.ratings.average) : '-'} (${squareData.ratings.place} out of ${totalSquares})`}/>
+                    <SquareInfoDetailRow label={'Price/Night'}
+                                         value={`${(getRoundNumber(squareData.pricePerNightWeekend.average))}${squareData.currency}`}
+                                         statistics={{
+                                             percentile: 0,
+                                             place: squareData.pricePerNightWeekend.place,
+                                             totalCount: totalSquares
+                                         }}
+                                         tooltipMessage={'Average price for properties per night in the middle of the week compare to other squares'}
+                                         fluctuate={'DECREASE'}
+                                         timeFrameChange={{
+                                             value: 8,
+                                             suffix: squareData.currency
+                                         }}
+
+                    />
+
                 </Row>
+                {/*<Row style={{marginTop: 8}}>*/}
+                {/*    <SquareInfoDetailRow label={'Avg. Rating'}*/}
+                {/*                         value={`${squareData.ratings.average ? getRoundNumber(squareData.ratings.average) : '-'} (${squareData.ratings.place} out of ${totalSquares})`}/>*/}
+                {/*</Row>*/}
                 <Row style={{marginTop: 8}}>
-                    <LabelValue label={'Avg. Location'}
-                                value={`${getRoundNumber(squareData.ratings.details.location.value)} (${squareData.ratings.details.location.place} out of ${totalSquares})`}/>
+                    <SquareInfoDetailRow label={'Rating Location'}
+                                         value={`${getRoundNumber(squareData.ratings.details.location.value)}`}
+                                         statistics={{
+                                             percentile: 0,
+                                             place: squareData.ratings.details.location.place || 0,
+                                             totalCount: totalSquares
+                                         }}
+                                         tooltipMessage={'Average location rating comparing to other squares'}
+                                         fluctuate={'DECREASE'}
+                                         timeFrameChange={{
+                                             value: -0.3,
+                                         }}
+
+                    />
+
                 </Row>
             </Col>
-            <Col span={6}>
-                <Space direction={"vertical"}>
-                    <Button style={{width: '100%'}} onClick={() => updateSquare()}>Update Square</Button>
-                    <Button style={{width: '100%'}}>Check Availability</Button>
-                </Space>
-            </Col>
-        </Row>
-        <Divider orientation="left">Occupancy</Divider>
-        <Row>
-            <Typography.Text className={'occupancies-text'}>
-                {getRoundNumber(districtOccupancies.average)}% for {districtOccupancies.data.length} dates
-            </Typography.Text>
+            {/*<Col span={6}>*/}
+            {/*    <Space direction={"vertical"}>*/}
+            {/*        <Button style={{width: '100%'}} onClick={() => updateSquare()}>Update Square</Button>*/}
+            {/*        <Button style={{width: '100%'}}>Check Availability</Button>*/}
+            {/*    </Space>*/}
+            {/*</Col>*/}
         </Row>
         <Row>
             <Col span={24}>

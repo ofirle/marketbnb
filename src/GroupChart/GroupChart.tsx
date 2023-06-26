@@ -37,6 +37,7 @@ const GroupChart = ({data, isGroup = false, averageLine = false}: {
                 label: groupKey
             };
         });
+        console.log(averagesDataArray);
 
         // Generate line plots for average data
         linesAveragePlots = averagesDataArray.map((item) => {
@@ -51,9 +52,9 @@ const GroupChart = ({data, isGroup = false, averageLine = false}: {
                         fill: 'red',
                         fillOpacity: 0.5,
                         stroke: 'black',
-                        lineWidth: 1,
+                        lineWidth: 3,
                         lineDash: [4, 5],
-                        strokeOpacity: 0.7,
+                        strokeOpacity: 0.4,
                         shadowColor: 'black',
                         shadowBlur: 10,
                         shadowOffsetX: 5,
@@ -74,15 +75,20 @@ const GroupChart = ({data, isGroup = false, averageLine = false}: {
     }
 
 // Generate configuration for Mix chart
-    const config: MixConfig = {
+    const config: any = {
+        legend: {
+            layout: 'horizontal'
+        },
         appendPadding: 8,
         tooltip: {
             shared: true,
         },
         syncViewPadding: true,
+
         plots: [
             {
                 type: 'column',
+
                 options: {
                     isGroup: isGroup,
                     seriesField: isGroup ? 'name' : null,
@@ -92,7 +98,6 @@ const GroupChart = ({data, isGroup = false, averageLine = false}: {
                     yAxis: {
                         max: ((maximumValue + 25) - (maximumValue % 25)),
                     },
-
                     meta: {
                         date: {
                             sync: true,

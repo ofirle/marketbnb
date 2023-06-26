@@ -1,3 +1,18 @@
+.square-headline-title {
+    font-size: 30px;
+    font-family: 'Roboto', 'sans-serif';
+    font-weight: 900;
+}
+.square-headline-location {
+    font-size: 12px;
+    font-family: 'Roboto', 'sans-serif';
+    font-weight: 900;
+}
+.square-headline-overview {
+    font-size: 22px;
+    font-family: 'Roboto', 'sans-serif';
+    font-weight: 900;
+}
 .square-headline {
     font-size: 22px;
     font-family: 'Roboto', 'sans-serif';

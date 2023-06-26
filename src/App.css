@@ -10,3 +10,7 @@
   height: 100vh;
   width: 100%;
 }
+
+.square-drawer .ant-drawer-body {
+  padding: 0;
+}

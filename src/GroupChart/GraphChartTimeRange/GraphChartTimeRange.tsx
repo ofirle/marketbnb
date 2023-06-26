@@ -1,28 +1,11 @@
-import {Button, Col, Row, Typography, Space} from "antd";
+import { Col, Row } from "antd";
 import GroupChart from "../GroupChart";
-import React, {useState} from "react";
-import {TimeFrameEnum} from "./timeRange.type";
-import TimeRangeOption from "./TimeRangeOption";
+import React from "react";
+import {TimeFrameEnum} from "../../components/TimeFrameTabs/timeRange.type";
+import TimeFrameTabs from "../../components/TimeFrameTabs/TimeFrameTabs";
 
 const GraphChartTimeRange = ({data, selected, onTimeFrameChanged, isGroup = false}: { data: any[], selected: TimeFrameEnum, onTimeFrameChanged: (key: TimeFrameEnum) => void, isGroup?: boolean }) => {
-    const timeFrames = [
-        {
-            key: TimeFrameEnum.Weeks4,
-            title: '4 Weeks'
-        },
-        {
-            key: TimeFrameEnum.Months3,
-            title: '3 Months'
-        },
-        {
-            key: TimeFrameEnum.Year,
-            title: 'This Year'
-        },
-        {
-            key: TimeFrameEnum.AllTime,
-            title: 'All Time'
-        }
-    ];
+
 
     const onClickedTimeFrame = (selectedKey: TimeFrameEnum) => {
         onTimeFrameChanged(selectedKey);
@@ -33,12 +16,9 @@ const GraphChartTimeRange = ({data, selected, onTimeFrameChanged, isGroup = fals
                 <GroupChart isGroup={isGroup} data={data} averageLine={true}/>
             </Col>
         </Row>
-        <Row style={{marginTop: 16}} justify="center">
-            <Col span={24}>
-                <Space size={'large'}>
-                {/*{timeFrames.map(item => <Button key={item.key} onClick={() => onClickedTimeFrame(item.key)}>{item.title}</Button>)}*/}
-                    {timeFrames.map(item => <TimeRangeOption key={item.key} title={item.title} onClick={() => onClickedTimeFrame(item.key)} isSelected={item.key===selected}/>)}
-                </Space>
+        <Row style={{marginTop: 16}}>
+            <Col span={24} style={{display: 'flex', justifyContent: 'center'}}>
+                <TimeFrameTabs selected={selected} onClick={onClickedTimeFrame}/>
             </Col>
         </Row>
     </>)
