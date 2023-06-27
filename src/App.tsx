@@ -11,8 +11,8 @@ import SquarePage from "./pages/SquarePage";
 import {FullInfoSquare} from "./GoogleMap/interfaces";
 
 const App = () => {
-    const {isLoaded} = useLoadScript({googleMapsApiKey: "AIzaSyAt-fPyvxpKWhAZJCQ_fo86d_REWkyfOZ4", libraries: ['places'] })
-    const [prices, setPrices] = useState({min: 0, max: 1300});
+    const {isLoaded} = useLoadScript({googleMapsApiKey: process.env.REACT_APP_GOOGLE_API_KEY as string, libraries: ['places'] })
+    const [prices, setPrices] = useState({min: 0, max: 1300})
     const [propertiesCount, setPropertiesCount] = useState(0);
     const [modalOpen, setModalOpen] = useState(false);
     const [open, setOpen] = useState(false);
