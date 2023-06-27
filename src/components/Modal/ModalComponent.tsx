@@ -4,7 +4,7 @@ import axios from "axios";
 import {useRecoilState} from "recoil";
 import {propertiesPricesFilter, squarePricesFilter} from "../../Atoms/FiltersAtoms";
 import HistogramSlider from "../HistogramSlider/HistogramSlider";
-
+const regionId = 1
 const ModalComponent = ({open, onClose}: { open: boolean; onClose: () => void }) => {
     const maxPropertiesPrice = 1060;
     const maxSquaresPrice = 600;
@@ -17,7 +17,7 @@ const ModalComponent = ({open, onClose}: { open: boolean; onClose: () => void })
 
     useEffect(() => {
         async function fetchData() {
-            const request = await axios.get(`${process.env.REACT_APP_API_URL}/properties/init?breakdown=${step}&max_price_properties=${maxPropertiesPrice}&max_price_squares=${maxSquaresPrice}`, {method: "get"});
+            const request = await axios.get(`${process.env.REACT_APP_API_URL}/properties/init?breakdown=${step}&max_price_properties=${maxPropertiesPrice}&max_price_squares=${maxSquaresPrice}&region_id=${regionId}`, {method: "get"});
             setAvailableProperties(request.data.properties as number[])
             setAvailableSquares(request.data.squares as number[])
         }

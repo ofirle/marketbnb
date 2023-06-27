@@ -45,7 +45,7 @@ const App = () => {
                 {isLoaded && <GoogleMapCustom filters={{propertiesCount: propertiesCount, prices: prices}} squareClicked={(square) => setClickedSquare(square)}/>}
             </Row>
             <Drawer width={640} placement="right" closable={false} onClose={onClose} open={open} className={'square-drawer'}>
-                <SquarePage id={clickedSquare ? clickedSquare.id : null} />
+                <SquarePage id={clickedSquare ? clickedSquare.id : null} closeDrawer={onClose}/>
             </Drawer>
         </>
     )

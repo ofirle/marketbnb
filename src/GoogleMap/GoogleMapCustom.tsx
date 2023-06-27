@@ -28,7 +28,7 @@ const onLoad = (infoBox: any) => {
     console.log('infoBox: ', infoBox)
 };
 
-
+const regionId = 1;
 const GoogleMapCustom = ({filters, squareClicked}: GoogleMapCustomProps) => {
     const DEFAULT_CENTER_MAP: { lat: number, lng: number } = {
         lat: 37.9742130138931,
@@ -46,7 +46,7 @@ const GoogleMapCustom = ({filters, squareClicked}: GoogleMapCustomProps) => {
         console.log("GoogleMapCustom Loaded")
 
         async function fetchData() {
-            const request = await axios.get(`${process.env.REACT_APP_API_URL}/coordinates/squaresCoordinates`, {method: "get"});
+            const request = await axios.get(`${process.env.REACT_APP_API_URL}/regions/${regionId}/squares`, {method: "get"});
             setSquaresCoordinates(request.data.data)
             setCenterMap(request.data.center);
 
@@ -59,7 +59,7 @@ const GoogleMapCustom = ({filters, squareClicked}: GoogleMapCustomProps) => {
     useEffect(() => {
         async function fetchData() {
             // if(filters.propertiesCount)
-            const request = await axios.get(`${process.env.REACT_APP_API_URL}/coordinates/info`, { method: "get", params: {
+            const request = await axios.get(`${process.env.REACT_APP_API_URL}/regions/${regionId}/squares/info`, { method: "get", params: {
                     checkIn: '2023-06-22', checkOut: '2023-06-25', propertiesCount: filters.propertiesCount, minPrice: filters.prices.min, maxPrice: filters.prices.max}
             });
             console.log(request.data.data, "datare")
@@ -148,6 +148,9 @@ const GoogleMapCustom = ({filters, squareClicked}: GoogleMapCustomProps) => {
             zoom={14}
             center={centerMap}
             key={'marker-example'}
+            onClick={(e: any) =>  {
+                console.log(e.latLng.lat())
+                console.log({lat: e.lat, lng: e.lng})}}
         >
             <Autocomplete
                 onLoad={onLoad}

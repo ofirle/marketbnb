@@ -1,28 +1,23 @@
-import {Button, Col, Collapse, Divider, Row, Space, Table, Typography} from "antd";
-import React, {useState} from "react";
-import {SquareData} from "../../interfaces/squarePage";
-// import AirbnbIcon from '../../assets/icons/airbnb-icon.svg';
-import Icon from '@ant-design/icons';
-import SquareInfoDetailRow from "./SquareInfoDetailRow";
-import './SquareInfo.css'
-import {getFormattedDate, getOccupancyTableData, getRoundNumber, getSmallestDaysDiffData} from "../../utils";
-import {ColumnsType} from "antd/es/table";
-import axios from "axios";
-import type {CollapseProps} from 'antd';
-import GraphChartTimeRange from "../../GroupChart/GraphChartTimeRange/GraphChartTimeRange";
-import {TimeFrameEnum} from "../TimeFrameTabs/timeRange.type";
+import {Button, Col, Row, Space, Typography} from "antd";
+import React from "react";
 
-const SquareHeadline = ({squareId, coordinates, airbnbUrl, googleMapsUrl, lastScrapedDate}: {
+import './SquareInfo.css'
+import {getFormattedDate} from "../../utils";
+
+import PopupConfirmation from "../Modal/PopupConfirmation";
+
+const SquareHeadline = ({squareId, coordinates, airbnbUrl, googleMapsUrl, lastScrapedDate, deleteAction}: {
     squareId: number,
     coordinates: any,
     airbnbUrl: string,
     googleMapsUrl: string,
     lastScrapedDate: string
+    deleteAction: Function
 }) => {
 
     return (
-        <div style={{backgroundColor: '#95CDF7'}}>
-            <Row style={{padding: 16}}>
+        <div style={{backgroundColor: '#95CDF7', width: '100%'}}>
+            <Row style={{padding: 16, width: '100%'}} >
                 <Col span={10}>
                     <Space direction={'vertical'} size={1}>
                         <Typography.Text className={'square-headline-title'}>SQUARE #{squareId}</Typography.Text>
@@ -34,9 +29,14 @@ const SquareHeadline = ({squareId, coordinates, airbnbUrl, googleMapsUrl, lastSc
                 </Col>
 
                 <Col span={14}>
-                    <Space direction={'vertical'}>
-                        <Typography.Text className={'last-scraped-data'}>Last
-                            Scraped: {getFormattedDate(lastScrapedDate)}</Typography.Text>
+                    <Space direction={'vertical'} >
+                        <Space direction={'horizontal'} >
+                            <Typography.Text className={'last-scraped-data'}>Last
+                                Scraped: {getFormattedDate(lastScrapedDate)}</Typography.Text>
+                            <PopupConfirmation action={deleteAction} title={'Delete Square'} content={'Are you sure?'} notificationMessage={`Square ${squareId} deleted successfully`}>
+                                <Button shape={'round'} style={{float: 'right'}} type={'primary'} danger>DELETE</Button>
+                            </PopupConfirmation>
+                        </Space>
                         <Space direction={'horizontal'}>
                             <Button shape={'round'}>Coordinates</Button>
                             <Button shape={'round'}>Airbnb</Button>
