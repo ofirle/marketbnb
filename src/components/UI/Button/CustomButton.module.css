@@ -1,0 +1,19 @@
+.iconButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 16px;
+    /*gap: 4px;*/
+    background: #597ef7;
+    color: #FFF;
+}
+
+.iconButton:hover {
+    background: #2F54EB;
+}
+
+.buttonText {
+    padding-left: 4px; /* Adjust the padding as needed */
+    color: #FFF;
+    font-size: 12px;
+}

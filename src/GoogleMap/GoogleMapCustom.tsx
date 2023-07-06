@@ -1,10 +1,21 @@
 import React, {useEffect, useState} from "react";
-import {Autocomplete, GoogleMap, InfoBox, LoadScript, InfoWindow, Marker, Polygon} from "@react-google-maps/api";
+import {
+    Autocomplete,
+    GoogleMap,
+    InfoBox,
+    LoadScript,
+    InfoWindow,
+    Marker,
+    Polygon,
+    DrawingManager
+} from "@react-google-maps/api";
 import axios from "axios";
 import {FullInfoSquare, SquareCoordinates, SquareData} from "./interfaces";
 import PolygonComponent from "./PolygonComponent";
 import {InfoBoxOptions} from "@react-google-maps/infobox";
 import InfoBoxContent from "./InfoBoxComponent/InfoBoxContent/InfoBoxContent";
+import * as turf from '@turf/turf';
+import {Position} from "@turf/turf";
 
 interface GoogleMapCustomProps {
     filters: {
@@ -15,6 +26,8 @@ interface GoogleMapCustomProps {
         };
     },
     squareClicked: (square: any) => void;
+    drawingMode: boolean
+    onDrawingCompleted: (squares: any[]) => void;
 }
 
 const divStyle = {
@@ -29,7 +42,7 @@ const onLoad = (infoBox: any) => {
 };
 
 const regionId = 1;
-const GoogleMapCustom = ({filters, squareClicked}: GoogleMapCustomProps) => {
+const GoogleMapCustom = ({filters, squareClicked, drawingMode, onDrawingCompleted}: GoogleMapCustomProps) => {
     const DEFAULT_CENTER_MAP: { lat: number, lng: number } = {
         lat: 37.9742130138931,
         lng: 23.726449789715446
@@ -59,8 +72,14 @@ const GoogleMapCustom = ({filters, squareClicked}: GoogleMapCustomProps) => {
     useEffect(() => {
         async function fetchData() {
             // if(filters.propertiesCount)
-            const request = await axios.get(`${process.env.REACT_APP_API_URL}/regions/${regionId}/squares/info`, { method: "get", params: {
-                    checkIn: '2023-06-22', checkOut: '2023-06-25', propertiesCount: filters.propertiesCount, minPrice: filters.prices.min, maxPrice: filters.prices.max}
+            const request = await axios.get(`${process.env.REACT_APP_API_URL}/regions/${regionId}/squares/info`, {
+                method: "get", params: {
+                    checkIn: '2023-06-22',
+                    checkOut: '2023-06-25',
+                    propertiesCount: filters.propertiesCount,
+                    minPrice: filters.prices.min,
+                    maxPrice: filters.prices.max
+                }
             });
             console.log(request.data.data, "datare")
             setAvailabilityData(request.data.data)
@@ -76,6 +95,7 @@ const GoogleMapCustom = ({filters, squareClicked}: GoogleMapCustomProps) => {
             const secondObj: any = availabilityData.find((secondObj: SquareData) => secondObj.square_id === firstObj.id);
             return {...firstObj, ...secondObj};
         });
+        console.log({mergedArray});
         setSquares(mergedArray);
     }, [squaresCoordinates, availabilityData])
 
@@ -111,16 +131,16 @@ const GoogleMapCustom = ({filters, squareClicked}: GoogleMapCustomProps) => {
         const colorLightBlue = '#ADD8E6';
         const colorGray = '#808080';
 
-        if(!occupancyRate) {
+        if (!occupancyRate) {
             options.fillColor = 'black';
         } else {
             let color = 'gray';
-            if(occupancyRate >= 95) color = colorBordeaux;
-            else if(occupancyRate >= 90) color = colorDarkRed;
-            else if(occupancyRate >= 85) color = colorLightRed;
-            else if(occupancyRate >= 76) color = colorOrange;
-            else if(occupancyRate >= 66) color = colorYellow;
-            else if(occupancyRate >= 50) color = colorLightBlue;
+            if (occupancyRate >= 95) color = colorBordeaux;
+            else if (occupancyRate >= 90) color = colorDarkRed;
+            else if (occupancyRate >= 85) color = colorLightRed;
+            else if (occupancyRate >= 76) color = colorOrange;
+            else if (occupancyRate >= 66) color = colorYellow;
+            else if (occupancyRate >= 50) color = colorLightBlue;
             else color = colorGray;
             options.fillColor = color;
         }
@@ -141,41 +161,119 @@ const GoogleMapCustom = ({filters, squareClicked}: GoogleMapCustomProps) => {
         // }
     }
 
+    const onPolygonComplete = (polygon2: any) => {
+        const function2 = (points: Position[]) => {
+
+            const squares = []
+            // console.log(points);
+
+            const polygon = turf.polygon([points]);
+            // var polygon = turf.polygon([[[-5, 52], [-4, 56], [-2, 51], [-7, 54], [-5, 52]]], { name: 'poly1' });
+
+            const boundingBox = turf.bbox(polygon);
+            const squareSizeX = 0.00117055221626;
+            const squareSizeY = 0.001460557432437;
+
+            // lng: 0.001460557432437, lat: 0.00117055221626 }
+// Calculate the number of squares that fit in the bounding box.
+            console.log((boundingBox[2] - boundingBox[0]) / squareSizeX, "X SQUARES")
+            console.log((boundingBox[3] - boundingBox[1]) / squareSizeY, "Y SQUARES")
+            const squaresY = Math.ceil((boundingBox[2] - boundingBox[0]) / squareSizeX);
+            const squaresX = Math.ceil((boundingBox[3] - boundingBox[1]) / squareSizeY);
+// For each potential square...
+            for (let x = 0; x <= squaresY; x++) {
+                for (let y = 0; y <= squaresX; y++) {
+                    // Calculate the square's coordinates.
+                    const squareCoordinates = [
+                        boundingBox[0] + x * squareSizeX,
+                        boundingBox[1] + y * squareSizeY
+                    ];
+
+                    // Create a point from the square's coordinates.
+                    const squarePoint = turf.point(squareCoordinates);
+                    const squaresPoint = [
+                        turf.point([squareCoordinates[0], squareCoordinates[1]]),
+                        turf.point([squareCoordinates[0], squareCoordinates[1] + squareSizeY]),
+                        turf.point([squareCoordinates[0] + squareSizeX, squareCoordinates[1]  + squareSizeY]),
+                        turf.point([squareCoordinates[0] + squareSizeX, squareCoordinates[1]]),
+                    ]
+
+                    // If the point is inside the polygon...
+                    // console.log(polygon, "polygon");
+                    const inSquare = squaresPoint.some((item => turf.booleanPointInPolygon(item, polygon)))
+                    if (inSquare) {
+                        console.log(squaresPoint, "squaresPoint");
+                        const square = [
+                            {lat: squareCoordinates[0], lng: squareCoordinates[1]},
+                            {lat: squareCoordinates[0], lng: squareCoordinates[1] + squareSizeY},
+                            {lat: squareCoordinates[0] + squareSizeX, lng: squareCoordinates[1]  + squareSizeY},
+                            {lat: squareCoordinates[0] + squareSizeX, lng: squareCoordinates[1]}
+                        ]
+                        // console.log(square, "squarePoint");
+                        squares.push({
+                            center: {lat: 0, lng: 0},
+                            coordinates: square,
+                            id: 1
+                        })
+                        // Draw or store the square.
+                        // Note that you might want to draw/store the full square, not just its center point.
+                        // This can be done by calculating the coordinates of the square's four corners.
+                    }
+                }
+            }
+                return squares;
+        }
+
+        console.log(polygon2, "POLOGON")
+        const positions = polygon2.latLngs.g[0].g.map((item: any) => [item.lat(), item.lng()])
+        const firstPoint = positions[0]
+        const squares = function2([...positions, firstPoint]);
+        onDrawingCompleted(squares);
+        // const squareSize = 1; // or whatever size you want
+    }
     return (
         <GoogleMap
             id="marker-example"
             mapContainerStyle={mapContainerStyle}
+
             zoom={14}
             center={centerMap}
             key={'marker-example'}
-            onClick={(e: any) =>  {
+            onClick={(e: any) => {
                 console.log(e.latLng.lat())
-                console.log({lat: e.lat, lng: e.lng})}}
+                console.log({lat: e.lat, lng: e.lng})
+                // onPolygonComplete("Test");
+            }}
         >
-            <Autocomplete
+            {/*<Autocomplete*/}
+            {/*    onLoad={onLoad}*/}
+            {/*    onPlaceChanged={onPlaceChanged}*/}
+            {/*>*/}
+            {/*    <input*/}
+            {/*        type="text"*/}
+            {/*        placeholder="Customized your placeholder"*/}
+            {/*        style={{*/}
+            {/*            boxSizing: `border-box`,*/}
+            {/*            border: `1px solid transparent`,*/}
+            {/*            width: `240px`,*/}
+            {/*            height: `32px`,*/}
+            {/*            padding: `0 12px`,*/}
+            {/*            borderRadius: `3px`,*/}
+            {/*            boxShadow: `0 2px 6px rgba(0, 0, 0, 0.3)`,*/}
+            {/*            fontSize: `14px`,*/}
+            {/*            outline: `none`,*/}
+            {/*            textOverflow: `ellipses`,*/}
+            {/*            position: "absolute",*/}
+            {/*            left: "50%",*/}
+            {/*            marginLeft: "-120px"*/}
+            {/*        }}*/}
+            {/*    />*/}
+            {/*</Autocomplete>*/}
+            {drawingMode && <DrawingManager
+                drawingMode={ google.maps.drawing.OverlayType.POLYGON}
                 onLoad={onLoad}
-                onPlaceChanged={onPlaceChanged}
-            >
-                <input
-                    type="text"
-                    placeholder="Customized your placeholder"
-                    style={{
-                        boxSizing: `border-box`,
-                        border: `1px solid transparent`,
-                        width: `240px`,
-                        height: `32px`,
-                        padding: `0 12px`,
-                        borderRadius: `3px`,
-                        boxShadow: `0 2px 6px rgba(0, 0, 0, 0.3)`,
-                        fontSize: `14px`,
-                        outline: `none`,
-                        textOverflow: `ellipses`,
-                        position: "absolute",
-                        left: "50%",
-                        marginLeft: "-120px"
-                    }}
-                />
-            </Autocomplete>
+                onPolygonComplete={onPolygonComplete}
+            />}
             <InfoBox
                 onLoad={onLoad}
                 options={options}
@@ -187,7 +285,8 @@ const GoogleMapCustom = ({filters, squareClicked}: GoogleMapCustomProps) => {
             </InfoBox>
             {squares.map((square: FullInfoSquare) => (
                 <PolygonComponent square={square} onChangeShowInfo={(value: boolean) => setShowInfo(value)}
-                                  setHoverSquare={((squareHover: FullInfoSquare) => setHoverSquare(squareHover))} squareClicked={(square) => squareClicked(square)}/>))}
+                                  setHoverSquare={((squareHover: FullInfoSquare) => setHoverSquare(squareHover))}
+                                  squareClicked={(square) => squareClicked(square)}/>))}
             {/*<Marker position={square.center} label={(square.id).toString()}/>*/}
         </GoogleMap>
     );

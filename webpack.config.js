@@ -24,11 +24,31 @@ module.exports = {
             },
             {
                 test: /\.svg$/,
-                use: ['@svgr/webpack'],
+                use: [
+                    {
+                        loader: 'babel-loader',
+                    },
+                    {
+                        loader: 'react-svg-loader',
+                        options: {
+                            jsx: true, // true outputs JSX tags
+                        },
+                    },
+                ],
             },
             {
                 test: /\.css$/,
-                use: ['style-loader', 'css-loader'],
+                use: [
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            modules: {
+                                localIdentName: '[name]__[local]--[hash:base64:5]',
+                            },
+                            importLoaders: 1,
+                        },
+                    },
+                ],
             },
         ],
     },
