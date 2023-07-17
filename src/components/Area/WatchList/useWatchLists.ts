@@ -1,27 +1,28 @@
 import {IWatchList} from "../MarketStatusBar/types";
 import axios from "axios";
+import {useEffect, useState} from "react";
 
-export const useWatchListActions = (id: number) => {
-    console.log(id);
-    const toggleVisibility = async ({ visible }: {
-        visible: boolean
-    }) => {
-        const response = await axios.patch(`${process.env.REACT_APP_API_URL}/watch_lists/${id}`, {visible});
+export const useWatchLists = (regionId: number) => {
+    const [watchLists, setWatchLists] = useState<IWatchList[]>([])
+    const [loading, setLoading] = useState<boolean>(false)
+    useEffect(() => {
+        fetchWatchLists();
+    }, [regionId])
+    const fetchWatchLists = async () => {
+        setLoading(true);
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/regions/${regionId}/watch_lists`);
+        setLoading(false);
         if(response.status === 200) {
-            return { status: 'success' }
+            setWatchLists(response.data);
         } else {
-            return { status: 'failed' }
+            console.log(`failed to fetch watchLists for region id: ${regionId}`)
         }
     }
 
-    const archive = async () => {
-        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/watch_lists/${id}`);
-        return response.data;
-    }
-
     return {
-        toggleVisibility,
-        archive,
+        data: watchLists,
+        loading,
+        fetchWatchLists,
     }
 
 }

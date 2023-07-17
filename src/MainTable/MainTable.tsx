@@ -1,6 +1,6 @@
 import {Table} from "antd";
 import React, {useEffect} from "react";
-import useAxios from "../FetchData/useAxios";
+import useAxios from "../hooks/useAxios";
 import './MainTable.css'
 import Link from "antd/es/typography/Link";
 

@@ -18,7 +18,6 @@ export interface FullInfoSquare {
     occupancy?: number;
     cost_per_night?: number | null;
     url?: string;
-    center: {lat: number, lng: number};
     coordinates: {lat: number, lng: number}[];
     id: number
 }

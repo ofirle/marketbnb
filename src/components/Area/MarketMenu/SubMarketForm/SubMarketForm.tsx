@@ -1,16 +1,15 @@
 import {Button, Form, Input, Select, Spin} from "antd";
 import axios from "axios";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import useFilterRegion from "../useFilterRegions";
 import styles from "../MarketMenu.module.css";
-export const MarketForm = ({onSuccess}: {onSuccess: () => void}) => {
+export const SubMarketForm = ({onSuccess}: {onSuccess: () => void}) => {
     const {
-        refetchCountries,
-        countriesOptions,
-        countrySelected,
-        setCountrySelected,
-        countryLoading,
+        fetchMarkets,
+        marketOptions,
+        marketLoading,
     } = useFilterRegion()
+    // const [marketOptions, setMarketOptions] = useState([]);
     const [form] = Form.useForm()
     const [loading, setLoading] = useState(false);
     const layout = {
@@ -20,10 +19,13 @@ export const MarketForm = ({onSuccess}: {onSuccess: () => void}) => {
     const tailLayout = {
         wrapperCol: {offset: 8, span: 16},
     };
+    useEffect(() => {
+        fetchMarkets();
+    }, [])
     const onFinish = async (values: any) => {
         console.log(values);
         setLoading(true);
-        const response = await axios.post(`${process.env.REACT_APP_API_URL}/markets`, {
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/sub_markets`, {
             ...values
         });
         setLoading(false);
@@ -45,11 +47,10 @@ export const MarketForm = ({onSuccess}: {onSuccess: () => void}) => {
             style={{maxWidth: 400}}
         >
             {loading ? <Spin /> : null}
-            <Form.Item name="countryId" label="Country" rules={[{required: true}]}>
-                <Select options={countriesOptions} value={countrySelected}
-                        className={styles.marketMenuSelect} placeholder={'Select Country'}
-                        onChange={(selectedValue) => setCountrySelected(selectedValue)}
-                        loading={countryLoading} style={{width: 200}}/>
+            <Form.Item name="marketId" label="Market" rules={[{required: true}]}>
+                <Select options={marketOptions}
+                        className={styles.marketMenuSelect} placeholder={'Select Market'}
+                        loading={marketLoading} style={{width: 200}}/>
             </Form.Item>
             <Form.Item name="label" label="Label" rules={[{required: true}]}>
                 <Input/>

@@ -55,7 +55,7 @@ const CreateArea = ({open, onClose}: { open: boolean; onClose: () => void }) => 
             // setAvailableSquares(request.data.squares as number[])
         }
 
-        fetchData();
+        // fetchData();
     }, [])
 
     const handleSubmit = () => {

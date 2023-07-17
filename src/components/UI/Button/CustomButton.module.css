@@ -3,9 +3,18 @@
     align-items: center;
     justify-content: center;
     padding: 5px 16px;
-    /*gap: 4px;*/
     background: #597ef7;
     color: #FFF;
+}
+
+.iconButton.disabled {
+    background: #8c8c8c;
+    cursor: not-allowed;
+}
+
+.iconButton.disabled:hover {
+    background: #8c8c8c;
+
 }
 
 .iconButton:hover {
@@ -13,7 +22,7 @@
 }
 
 .buttonText {
-    padding-left: 4px; /* Adjust the padding as needed */
+    padding-left: 4px;
     color: #FFF;
     font-size: 12px;
 }

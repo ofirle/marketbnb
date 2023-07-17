@@ -1,7 +1,16 @@
-import {Button, Form, Input, Spin} from "antd";
+import {Button, Form, Input, Select, Spin} from "antd";
 import axios from "axios";
-import {useState} from "react";
-export const CountryForm = ({onSuccess}: {onSuccess: () => void}) => {
+import React, {useState} from "react";
+import useFilterRegion from "../useFilterRegions";
+import styles from "../MarketMenu.module.css";
+export const MarketForm = ({onSuccess}: {onSuccess: () => void}) => {
+    const {
+        fetchCountries,
+        countriesOptions,
+        countrySelected,
+        setCountrySelected,
+        countryLoading,
+    } = useFilterRegion()
     const [form] = Form.useForm()
     const [loading, setLoading] = useState(false);
     const layout = {
@@ -12,8 +21,9 @@ export const CountryForm = ({onSuccess}: {onSuccess: () => void}) => {
         wrapperCol: {offset: 8, span: 16},
     };
     const onFinish = async (values: any) => {
+        console.log(values);
         setLoading(true);
-        const response = await axios.post(`${process.env.REACT_APP_API_URL}/countries`, {
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/markets`, {
             ...values
         });
         setLoading(false);
@@ -35,10 +45,13 @@ export const CountryForm = ({onSuccess}: {onSuccess: () => void}) => {
             style={{maxWidth: 400}}
         >
             {loading ? <Spin /> : null}
-            <Form.Item name="label" label="Label" rules={[{required: true}]}>
-                <Input/>
+            <Form.Item name="countryId" label="Country" rules={[{required: true}]}>
+                <Select options={countriesOptions} value={countrySelected}
+                        className={styles.marketMenuSelect} placeholder={'Select Country'}
+                        onChange={(selectedValue) => setCountrySelected(selectedValue)}
+                        loading={countryLoading} style={{width: 200}}/>
             </Form.Item>
-            <Form.Item name="key" label="Key" rules={[{required: true}]}>
+            <Form.Item name="label" label="Label" rules={[{required: true}]}>
                 <Input/>
             </Form.Item>
             <Form.Item {...tailLayout}>

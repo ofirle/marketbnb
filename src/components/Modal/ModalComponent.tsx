@@ -26,7 +26,6 @@ const ModalComponent = ({open, onClose}: { open: boolean; onClose: () => void })
     }, [])
 
     const handleSubmit = () => {
-        // setFilters using recoil
         onClose();
     }
 

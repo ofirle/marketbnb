@@ -1,12 +1,12 @@
-.marketMenuTitle {
+.menuTitle {
     font-size: 24px;
 }
 
-.marketMenuLayout {
+.menuLayout {
     background: #FFF;
     width: 18%;
     position: absolute;
-    top: 140px;
+    /*top: 140px;*/
     z-index: 999;
     left: 10px;
     padding: 20px;
@@ -14,11 +14,11 @@
     border-radius: 12px;
 }
 
-.marketMenuSelect {
+.menuSelect {
     width: 100%;
 }
 
-.marketMenuSelect :global(.ant-select-selector) {
+.menuSelect :global(.ant-select-selector) {
     border-radius: 50px;
 
 }
